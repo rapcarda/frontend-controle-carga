@@ -1,56 +1,131 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
+    <div>
+      <v-app-bar
+        color="deep-purple accent-4"
+        
+        dark
       >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>open_in_new</v-icon>
-      </v-btn>
-    </v-app-bar>
 
-    <v-main>
-      <HelloWorld/>
-    </v-main>
+      <v-img
+          contain
+          lazy-src="./assets/logo_size.jpg"
+          max-height="100"
+          max-width="100"
+          src="./assets/logo_size.jpg"
+        ></v-img>
+        <!-- <v-img src="./assets/logo_size.jpg" ></v-img> -->
+        <v-toolbar-title class="ml-2">Controle Cargas</v-toolbar-title>
+
+        <v-spacer></v-spacer>
+
+        <v-btn icon class="ml-2 mr-5">
+          Movimento
+        </v-btn>
+
+        <v-divider
+          class="mx-4"
+          vertical
+        ></v-divider>
+
+        <v-menu
+          open-on-hover
+          offset-y
+          :rounded="rounded"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn 
+              v-bind="attrs"
+              v-on="on" 
+              icon 
+              class="ml-2 mr-2 white--text ma-8">
+              Cliente
+            </v-btn>
+          </template>
+
+          <v-list>
+            <v-list-item link>
+              <v-list-item-title>Cliente</v-list-item-title>
+            </v-list-item>
+
+            <v-divider class="ml-2 mr-2"></v-divider>
+
+            <v-list-item link>
+              <v-list-item-title>Produto</v-list-item-title>
+            </v-list-item>
+
+            <v-divider class="ml-2 mr-2"></v-divider>
+
+            <v-list-item link>
+              <v-list-item-title>Cliente X Produto</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+
+        <v-divider
+          class="mx-4"
+          vertical
+        ></v-divider>
+
+        <v-btn icon class="ml-2 mr-2">
+          Frota
+        </v-btn>
+
+        <v-divider
+          class="mx-4"
+          vertical
+        ></v-divider>
+
+        <v-btn icon class="ml-2 mr-2">
+          Coletor
+        </v-btn>
+
+        <v-divider
+          class="mx-4"
+          vertical
+        ></v-divider>
+
+        <v-menu
+          open-on-hover
+          offset-y
+          :rounded="rounded"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn 
+              icon 
+              class="ml-2 mr-2"
+              v-bind="attrs"
+              v-on="on" >
+              <v-icon>account_circle</v-icon>
+            </v-btn>
+          </template>
+
+          <v-list>
+            <v-list-item link>
+              <v-list-item-title>Usuario</v-list-item-title>
+            </v-list-item>
+
+            <v-divider class="ml-2 mr-2"></v-divider>
+
+            <v-list-item link>
+              <v-list-item-title>Logoff</v-list-item-title>
+            </v-list-item>
+          </v-list>
+
+        </v-menu>
+
+      </v-app-bar>
+    </div>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld,
+
   },
 
   data: () => ({
