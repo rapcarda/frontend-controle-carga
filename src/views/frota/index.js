@@ -1,0 +1,1 @@
+export { default as frotaRouters } from './router.js'

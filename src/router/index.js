@@ -1,10 +1,22 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import { coletorRouters } from "@/views/coletor"
+import { frotaRouters } from "@/views/frota"
+import { clienteRouters } from "@/views/cliente"
+import { produtoRouters } from "@/views/produto"
+import { clienteProdutoRouters } from "@/views/clienteProduto"
+import { usuarioRouters } from "@/views/usuario"
 import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
+  ...coletorRouters,
+  ...frotaRouters,
+  ...clienteRouters,
+  ...produtoRouters,
+  ...clienteProdutoRouters,
+  ...usuarioRouters,
   {
     path: '/',
     name: 'Home',

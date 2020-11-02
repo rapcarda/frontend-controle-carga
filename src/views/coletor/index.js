@@ -1,0 +1,1 @@
+export { default as coletorRouters } from './router.js'

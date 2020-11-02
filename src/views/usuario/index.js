@@ -1,0 +1,1 @@
+export { default as usuarioRouters } from './router.js'
