@@ -96,6 +96,8 @@
             color="green"
             dark
             class="ml-2"
+            :disabled="isEnabledToPrint()"
+            @click="printMovim()"
         >Imprimir</v-btn>
 
       </v-toolbar>
@@ -130,21 +132,33 @@
       </td>
     </template>
 
+    <template v-slot:[`item.actions`]="{ item }">
+      <v-icon
+        small
+        class="mr-2"
+        @click="printMovim(item.id)"
+      >
+        print
+      </v-icon>
+    </template>
+
     <template v-slot:no-data>
-      <v-btn
-        v-if="responseGet !== '401'"
-        color="primary"
-        @click="GetMovimento()"
-      >Nenhuma informação. Pesquisar novamente</v-btn>
+      <v-alert
+        dense
+        outlined
+        type="error"
+        class="mt-4"
+      >Nenhuma informação para o período selecionado.</v-alert>
     </template>
 
   </v-data-table>
-</template>>
+</template>
 
 <script>
 
-import { required, maxLength } from 'vuelidate/lib/validators'
 import moment from 'moment'
+import { jsPDF } from "jspdf";
+import 'jspdf-autotable'
 import service from './service'
 
 export default {
@@ -163,7 +177,8 @@ export default {
             { text: 'Nome Usuário', value: 'usuarioNome' },
             { text: 'Frota', value: 'frotaPlaca' },
             { text: 'Data/Hora Inicial', value: 'dataHoraInicial' },
-            { text: 'Data/Hora Final', value: 'dataHoraFinal' }
+            { text: 'Data/Hora Final', value: 'dataHoraFinal' },
+            { text: '', value: 'actions', sortable: false, align: 'end' }
         ],
         headersItemMovim: [
             { text: 'Código Cliente', value: 'clienteCodigo' },
@@ -188,6 +203,7 @@ export default {
             produtoDescricao: '',
             qtd: ''
         },
+        movimPrint: [],
         responseGet: ''
     }),
 
@@ -206,55 +222,14 @@ export default {
         
         getMsgNoData () {
           return this.responseGet
-        },
-
-        placaErrors () {
-            const errors = []
-            const placa = this.$v.frota.placa
-            
-            if (!placa.$dirty) {
-                return errors
-            }
-
-            !placa.required && errors.push('Placa obrigatória')
-            !placa.maxLength && errors.push(`Placa deve ter no máximo ${placa.$params.maxLength.max} caracteres`)
-
-            return errors
-        },
-
-        descricaoErrors () {
-            const errors = []
-            const descricao = this.$v.frota.descricao
-
-            if (!descricao.$dirty) {
-                return errors
-            }
-            
-            !descricao.required && errors.push('Descrição obrigatória')
-            !descricao.maxLength && errors.push(`Descrição deve ter no máximo ${descricao.$params.maxLength.max} caracteres`)
-
-            return errors
         }
-    },
-
-    validations () {
-      const validations = {
-        frota: {
-          placa: {
-            required,
-            maxLength: maxLength(10)
-          },
-          descricao: {
-            required,
-            maxLength: maxLength(100)
-          }
-        }
-      }
-
-      return validations
     },
 
     methods: {
+        isEnabledToPrint () {
+          return this.movimList.length === 0 ? true : false
+        },
+        
         async GetMovimento () {
             this.isLoading = true
 
@@ -269,12 +244,10 @@ export default {
             
             //try {
               response = await service.getMovimento(filter)
-              console.log('response: ', response)
 
               this.movimList = this._createObjMovimento(response.data.data)
               this.itemMovimList = this._createObjItemMovimento(response.data.data)
-
-              console.log('itens: ', this.itemMovimList)
+              this.movimPrint = response.data.data
 
               //this.movimList = response.data.data
            // }
@@ -297,6 +270,69 @@ export default {
           if (!date) return null
           const [year, month, day] = date.split('-')
           return `${day}/${month}/${year}`
+        },
+
+        printMovim (item) {
+            //Cria uma instância do gerador de PDF
+            const doc = new jsPDF({
+              orientation: 'lendscape',
+              unit: 'in',
+              format: 'letter'
+            })
+
+            //Indica qual o tamanho da fonte no PDF
+            doc.setFontSize(16).text(this._getHeaderPrint(item), 0.5, 1.0)
+
+            // //Imprime uma linha embaixo do cabeçalho
+            doc.setLineWidth(0.01).line(0.5, 1.1, 10.5, 1.1)
+
+            doc.autoTable({
+              startY: 1.3,
+              head: [['Cód. Movim.', 'Usuário', 'Frota', 'Data/Hora Inicio', 'Data/Hora Fim', 'Cliente', 'Produto', 'Qtd']],
+              body: this._createObjItemPrint(item),
+              margim: { left: 0.5, top: 100}
+            })
+
+            doc.save(`${this._getHeaderPrint(item)}.pdf`)
+        },
+
+        _getHeaderPrint (idMovim) {
+          if (idMovim) {
+            return `Movimento #${idMovim}`
+          } else {
+            return `Movimentos de ${this.fromDateDisp} até ${this.toDateDisp}` 
+          }
+        },
+
+        _createObjItemPrint (item) {
+            let obj = []
+            let movimOld = ''
+            let movimentos = []
+
+            if (item) {
+              movimentos = this.movimPrint.filter(x => x.id === item)
+            } else {
+              movimentos = this.movimPrint
+            }
+
+            movimentos.forEach(movim => {
+              movim.itemMovimento.forEach(item => {
+                let objPrint = []
+                if (movimOld === '') {
+                  objPrint = [movim.id, movim.usuarioNome, movim.frotaPlaca, moment(movim.dataHoraInicial).format('DD/MM/YYYY HH:mm:ss'),
+                                moment(movim.dataHoraFinal).format('DD/MM/YYYY HH:mm:ss'), item.clienteDescricao, item.produtoDescricao, item.qtd]
+                } else {
+                  objPrint = ['', '', '', '', '', item.clienteDescricao, item.produtoDescricao, item.qtd]
+                }
+                
+                movimOld = movim.id
+
+                obj.push(objPrint)
+              });
+              movimOld = ''
+            });
+
+            return obj
         },
 
         _createObjMovimento (response) {

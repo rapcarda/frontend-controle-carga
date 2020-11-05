@@ -9,7 +9,6 @@ import { clienteProdutoRouters } from "@/views/clienteProduto"
 import { usuarioRouters } from "@/views/usuario"
 import { authRouters } from "@/views/auth"
 import { movimentoRouters } from "@/views/movimento"
-import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
 
@@ -24,16 +23,8 @@ const routes = [
   ...movimentoRouters,
   {
     path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    name: 'home',
+    redirect: '/movimento'
   }
 ]
 
