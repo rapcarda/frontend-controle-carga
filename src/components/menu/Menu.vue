@@ -18,7 +18,7 @@
 
         <v-spacer></v-spacer>
 
-        <v-btn icon class="ml-2 mr-5" :exact="true">
+        <v-btn icon class="ml-2 mr-5" :exact="true" to="/movimento">
           Movimento
         </v-btn>
 
@@ -107,7 +107,7 @@
             <v-divider class="ml-2 mr-2"></v-divider>
 
             <v-list-item link :exact="true">
-              <v-list-item-title>Logoff</v-list-item-title>
+              <v-list-item-title @click="doLogoff">Logoff</v-list-item-title>
             </v-list-item>
           </v-list>
 
@@ -118,8 +118,20 @@
 </template>
 
 <script>
+
+import { mapActions } from 'vuex'
+
 export default {
-    name: "Menu"
+    name: "Menu",
+
+    methods: {
+      ...mapActions('auth', ['ActionSignOut']),
+
+      doLogoff () {
+        this.ActionSignOut()
+        this.$router.push({ name: 'login' })
+      }
+    }
 }
 </script>
 

@@ -55,7 +55,7 @@ Vue.toasted.register('toaster_crud_success',
   optionsSuccess
 )
 
-new Vue({
+window._Vue = new Vue({
   router,
   store,
   vuetify,

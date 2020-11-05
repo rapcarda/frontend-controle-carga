@@ -1,0 +1,1 @@
+export { default as movimentoRouters } from './router.js'

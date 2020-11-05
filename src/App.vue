@@ -1,11 +1,13 @@
 <template>
   <v-app>
     <v-main>
-    <Menu />
 
-    <v-container class="col-md-10">
-      <router-view />
-    </v-container>
+      <Menu v-if="!isLogin"/>
+
+      <v-container :class="{'fill-height': isLogin, 'col-md-10': !isLogin}">
+        <router-view />
+      </v-container>
+
     </v-main>
   </v-app>
 </template>
@@ -22,8 +24,14 @@ export default {
   },
 
   data: () => ({
-    //
+
   }),
+
+  computed: {
+    isLogin () {
+      return this.$route.path.indexOf('/login') !== -1
+    }
+  }
 };
 </script>
 
